@@ -38,7 +38,7 @@ router.get('/', async(req,res) =>{
 })
 
 
-
+// Updata Person details through the id
 router.put('/:id',async (req, res) =>{
     try {
         const personId = req.params.id;   // Extract the id from the URl parametr
