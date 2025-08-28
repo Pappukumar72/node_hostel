@@ -1,4 +1,6 @@
 const express = require('express')
+const passport = require("./auth.js")
+
 
 const app = express()
 const db = require("./db")
@@ -11,6 +13,21 @@ const Person = require("./models/personSchema.js")
 const MenuItem = require("./models/menuItem.js")
 
 
+// Middleware Function
+const logRequest = (req, res, next) => {
+    console.log(`${new Date().toLocaleString()} Request Made to ${req.originalUrl}`);
+    next() // Move on to the next phase
+}
+// It apply all the Router
+// app.use(logRequest)
+
+
+
+
+app.use(passport.initialize());
+
+const localAuthMiddleware = passport.authenticate('local', {session: false})
+
 app.get('/', function(req, res) {
     res.send("Welcome to hotel")
 })
@@ -18,12 +35,18 @@ app.get('/', function(req, res) {
 
 // Import the Person Router files
 const personRouter = require("./routes/personRoute.js")
-app.use('/person',personRouter)
+app.use('/person',localAuthMiddleware,personRouter)
+
+// Apply login on person router
+// app.use('/person',logRequest,personRouter) 
 
 
 // Import the Menu Router file
 const menuRouter = require("./routes/manuRoute.js")
-app.use('/menu', menuRouter)
+app.use('/menu',localAuthMiddleware, menuRouter)
+
+// Apply login on menu router
+// app.use('/menu', menuRouter)
 
 
 
@@ -66,11 +89,13 @@ app.listen(3000, () => {
 })
 
 // {
-//     "name" : "ram kumar",
+//     "name" : "aman kumar",
+//     "username": "amankumar"
+//     "password" : "123456"
 //     "age" : 25,
 //     "work" : "chef",
 //     "mobile" : "123-456-789",
-//     "email" : "ram@gmail.com",
+//     "email" : "aman@gmail.com",
 //     "address" :"123main fh city",
 //     "salary" : 60000
 // }
